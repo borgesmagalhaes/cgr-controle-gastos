@@ -27,7 +27,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     // Usa caminho absoluto para evitar erro de path relativo quando a API sobe pela raiz via npm.
     var sqlitePath = Path.GetFullPath(
-        Path.Combine(builder.Environment.ContentRootPath, "..", "..", "sqlite", "cgr.db"));
+        Path.Combine(builder.Environment.ContentRootPath, "..", "sqlite", "cgr.db"));
 
     var connectionString = $"Data Source={sqlitePath};Foreign Keys=True";
     options.UseSqlite(connectionString);
@@ -74,5 +74,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-

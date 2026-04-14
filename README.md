@@ -21,14 +21,14 @@ Projeto full stack para processo seletivo, com foco em regras de negócio, simpl
 ## Estrutura do projeto
 
 ```text
-backend/Cgr.Api
+backend
   Controllers/
   Dtos/
   Domain/Entities/
   Infrastructure/Data/
   Services/
 
-frontend/cgr-web
+frontend
   src/
     api.ts
     types.ts
@@ -51,7 +51,7 @@ Na raiz do projeto:
 
 ```bash
 npm install
-npm --prefix frontend/cgr-web install
+npm --prefix frontend install
 ```
 
 ### 2. Subir tudo com um comando
@@ -72,7 +72,7 @@ Esse comando sobe:
 ### Back-end
 
 ```bash
-cd backend/Cgr.Api
+cd backend
 dotnet restore
 dotnet run
 ```
@@ -80,7 +80,7 @@ dotnet run
 ### Front-end
 
 ```bash
-cd frontend/cgr-web
+cd frontend
 npm install
 npm run dev
 ```
