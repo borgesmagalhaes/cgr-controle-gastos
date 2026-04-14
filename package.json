@@ -1,0 +1,13 @@
+{
+  "name": "iam-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm --prefix frontend/cgr-web run dev",
+    "dev:backend": "dotnet run --project backend/Cgr.Api -p:UseAppHost=false"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

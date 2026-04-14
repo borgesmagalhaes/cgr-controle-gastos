@@ -1,0 +1,18 @@
+# Build output (dotnet)
+backend/**/bin/
+backend/**/obj/
+
+# Build output (front)
+frontend/**/dist/
+
+# Node modules
+node_modules/
+frontend/**/node_modules/
+
+# Logs
+*.log
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
