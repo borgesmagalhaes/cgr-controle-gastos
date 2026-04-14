@@ -16,9 +16,9 @@ public class TransacaoCreateRequest
     public decimal Valor { get; set; }
 
     /// <summary>
-    /// Tipo em texto: despesa ou receita.
+    /// Identificador do tipo (FK para tabela tipo_transacao).
     /// </summary>
-    public string Tipo { get; set; } = string.Empty;
+    public int IdTipo { get; set; }
 
     /// <summary>
     /// Identificador da categoria.

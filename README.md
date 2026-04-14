@@ -96,7 +96,7 @@ npm run dev
 - Transação:
   - descrição obrigatória (máximo 400)
   - valor positivo
-  - tipo deve existir em `tipo_transacao`
+  - `idTipo` deve existir em `tipo_transacao`
   - categoria precisa ser compatível com o tipo
 - Ao excluir uma pessoa:
   - as transações dessa pessoa são excluídas junto (cascade)
@@ -155,7 +155,7 @@ npm run dev
 {
   "descricao": "Compra mensal",
   "valor": 250.5,
-  "tipo": "despesa",
+  "idTipo": 1,
   "idCategoria": 1,
   "idPessoa": 1
 }

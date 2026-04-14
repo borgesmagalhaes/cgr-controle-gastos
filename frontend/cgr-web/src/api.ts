@@ -65,7 +65,7 @@ export const transacaoApi = {
   create: (body: {
     descricao: string;
     valor: number;
-    tipo: string;
+    idTipo: number;
     idCategoria: number;
     idPessoa: number;
   }) => request<Transacao>("/api/transacoes", { method: "POST", body: JSON.stringify(body) }),

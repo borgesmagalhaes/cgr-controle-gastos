@@ -43,16 +43,14 @@ public class TransacaoService(AppDbContext dbContext)
             throw new InvalidOperationException("Descricao da transacao e obrigatoria.");
         }
 
-        // Regra de entrada: Buscamos diretamente na tabela de domínio.
-        var tipoDescricao = request.Tipo.Trim().ToLowerInvariant();
-
+        // Regra de entrada: o front envia idTipo e validamos na tabela de domínio.
         var tipo = await dbContext.TiposTransacao
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Descricao == tipoDescricao, cancellationToken);
+            .FirstOrDefaultAsync(t => t.Id == request.IdTipo, cancellationToken);
 
         if (tipo is null)
         {
-            throw new InvalidOperationException("Tipo invalido. Use: despesa ou receita.");
+            throw new InvalidOperationException("Tipo invalido.");
         }
 
         // Garante integridade referencial: pessoa precisa existir.
@@ -86,7 +84,7 @@ public class TransacaoService(AppDbContext dbContext)
         {
             Descricao = request.Descricao.Trim(),
             Valor = request.Valor,
-            IdTipo = tipo.Id,
+            IdTipo = request.IdTipo,
             IdCategoria = request.IdCategoria,
             IdPessoa = request.IdPessoa
         };
@@ -116,5 +114,4 @@ public class TransacaoService(AppDbContext dbContext)
         };
     }
 }
-
 

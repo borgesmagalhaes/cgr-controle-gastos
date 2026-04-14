@@ -16,7 +16,7 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
   const [descricaoTransacao, setDescricaoTransacao] = useState("");
   const [valorTransacao, setValorTransacao] = useState<number>(0);
   const [valorTransacaoTexto, setValorTransacaoTexto] = useState("R$ 0,00");
-  const [tipoTransacao, setTipoTransacao] = useState("");
+  const [idTipoTransacao, setIdTipoTransacao] = useState<number | "">("");
   const [idPessoaTransacao, setIdPessoaTransacao] = useState<number | "">("");
   const [idCategoriaTransacao, setIdCategoriaTransacao] = useState<number | "">("");
 
@@ -49,9 +49,22 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
   }, [pessoas, idPessoaTransacao]);
   const menorDeIdadeSelecionado = Boolean(pessoaSelecionada && pessoaSelecionada.idade < 18);
 
+  // Descobre a descricao do tipo selecionado para regras de compatibilidade (despesa/receita).
+  const tipoSelecionadoDescricao = useMemo(() => {
+    if (idTipoTransacao === "") {
+      return "";
+    }
+
+    return tiposTransacao.find((tipo) => tipo.id === idTipoTransacao)?.descricao ?? "";
+  }, [idTipoTransacao, tiposTransacao]);
+
   const categoriasCompativeis = useMemo(() => {
-    return categorias.filter((categoria) => categoria.finalidade === "ambas" || categoria.finalidade === tipoTransacao);
-  }, [categorias, tipoTransacao]);
+    if (!tipoSelecionadoDescricao) {
+      return [];
+    }
+
+    return categorias.filter((categoria) => categoria.finalidade === "ambas" || categoria.finalidade === tipoSelecionadoDescricao);
+  }, [categorias, tipoSelecionadoDescricao]);
 
   useEffect(() => {
     // "Escuta o sininho": reloadKey mudou, recarrega os dados da tela.
@@ -67,16 +80,17 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
 
   useEffect(() => {
     // Regra visual: menor de idade não pode manter "receita" selecionado no campo tipo.
-    if (menorDeIdadeSelecionado && tipoTransacao === "receita") {
-      setTipoTransacao("despesa");
+    if (menorDeIdadeSelecionado && tipoSelecionadoDescricao === "receita") {
+      const tipoDespesa = tiposTransacao.find((tipo) => tipo.descricao === "despesa");
+      setIdTipoTransacao(tipoDespesa ? tipoDespesa.id : "");
     }
-  }, [menorDeIdadeSelecionado, tipoTransacao]);
+  }, [menorDeIdadeSelecionado, tipoSelecionadoDescricao, tiposTransacao]);
 
   useEffect(() => {
-    if (tipoTransacao && !tiposTransacao.some((tipo) => tipo.descricao === tipoTransacao)) {
-      setTipoTransacao("");
+    if (idTipoTransacao !== "" && !tiposTransacao.some((tipo) => tipo.id === idTipoTransacao)) {
+      setIdTipoTransacao("");
     }
-  }, [tiposTransacao, tipoTransacao]);
+  }, [tiposTransacao, idTipoTransacao]);
 
   async function carregarTransacoes(): Promise<void> {
     setLoading(true);
@@ -112,7 +126,7 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
         throw new Error("Selecione a pessoa.");
       }
 
-      if (!tipoTransacao) {
+      if (idTipoTransacao === "") {
         throw new Error("Selecione o tipo.");
       }
 
@@ -120,7 +134,7 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
         throw new Error("Selecione a categoria.");
       }
 
-      if (menorDeIdadeSelecionado && tipoTransacao === "receita") {
+      if (menorDeIdadeSelecionado && tipoSelecionadoDescricao === "receita") {
         throw new Error("Menor de idade pode registrar apenas despesa.");
       }
 
@@ -131,7 +145,7 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
       await transacaoApi.create({
         descricao: descricaoTransacao,
         valor: Number(valorTransacao),
-        tipo: tipoTransacao,
+        idTipo: Number(idTipoTransacao),
         idCategoria: Number(idCategoriaTransacao),
         idPessoa: Number(idPessoaTransacao),
       });
@@ -140,7 +154,7 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
       setValorTransacao(0);
       setValorTransacaoTexto("R$ 0,00");
       // Após salvar, voltamos os combos para placeholder para deixar claro que é um novo cadastro.
-      setTipoTransacao("");
+      setIdTipoTransacao("");
       setIdPessoaTransacao("");
       setIdCategoriaTransacao("");
       await carregarTransacoes();
@@ -207,8 +221,8 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
           <label className="form-label">Tipo</label>
           <select
             className="form-select"
-            value={tipoTransacao}
-            onChange={(e) => setTipoTransacao(e.target.value)}
+            value={idTipoTransacao}
+            onChange={(e) => setIdTipoTransacao(e.target.value === "" ? "" : Number(e.target.value))}
             disabled={tiposTransacao.length === 0}
             required
           >
@@ -216,7 +230,7 @@ export function TransacoesPage({ reloadKey, onDataChanged }: CrudPageProps) {
             {tiposTransacao.map((tipo) => (
               <option
                 key={tipo.id}
-                value={tipo.descricao}
+                value={tipo.id}
                 disabled={tipo.descricao === "receita" && Boolean(pessoaSelecionada && pessoaSelecionada.idade < 18)}
               >
                 {tipo.descricao}
